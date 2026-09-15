@@ -71,7 +71,7 @@
 
   #map{height:clamp(22rem,58vh,34rem);border:var(--line) solid var(--ink);background:var(--paper-2);z-index:0}
   .leaflet-container{font-family:"Newsreader",Georgia,serif;background:var(--paper-2)}
-  .leaflet-tile-pane{filter:saturate(.55) contrast(.94) brightness(1.02)}
+  .leaflet-tile-pane{filter:grayscale(.72) contrast(.88) brightness(1.08)}
   .leaflet-bar a{color:var(--ink)}
   .leaflet-popup-content-wrapper{border-radius:3px;box-shadow:0 6px 22px rgba(23,36,31,.18)}
   .leaflet-popup-content{margin:.85rem 1rem;line-height:1.5}
@@ -189,6 +189,8 @@
   .leg__mon{display:block;font-family:"Bricolage Grotesque",sans-serif;font-weight:500;font-size:.85rem;color:var(--stone);margin-top:.3rem}
 
   .leg__body{grid-column:3;max-width:var(--measure)}
+  .scene{display:block;width:100%;height:auto;margin-bottom:1.15rem;
+    border:1px solid rgba(23,36,31,.2)}
   .leg__title{font-size:clamp(1.35rem,2.6vw,1.75rem);color:var(--accent)}
   .leg__note{margin-top:.6rem;color:var(--stone);font-style:italic;font-size:.97em}
 
@@ -218,6 +220,12 @@
   .maybe li::marker{color:var(--accent)}
 
   /* ---------- baon ---------- */
+  .need{margin-top:1.75rem;border-top:1px solid rgba(23,36,31,.22);padding-top:.95rem}
+  .need h4{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:.92rem;
+    margin:0 0 .45rem;color:var(--accent)}
+  .check--day li{break-inside:avoid}
+  @media (min-width:720px){.check--day{columns:2;column-gap:2rem}}
+
   .baon{border-top:var(--line) solid var(--ink);padding:clamp(2.5rem,5vw,4rem) 0 clamp(3rem,6vw,5rem)}
   .baon h2{font-size:clamp(1.6rem,3.4vw,2.1rem);max-width:18ch}
   .baon__intro{margin-top:.9rem;max-width:52ch;color:#3A473F}
@@ -365,6 +373,29 @@
         <span class="leg__mon">September</span>
       </div>
       <div class="leg__body">
+        <svg class="scene" viewBox="0 0 800 190" role="img" aria-label="Gabing biyahe sa gitna ng palayan ng Nueva Ecija">
+          <rect width="800" height="190" fill="var(--ink)"/>
+          <circle cx="648" cy="44" r="16" fill="var(--paper)" opacity=".92"/>
+          <circle cx="640" cy="39" r="14" fill="var(--ink)"/>
+          <g fill="var(--paper)" opacity=".5">
+            <circle cx="88" cy="34" r="1.6"/><circle cx="168" cy="58" r="1.1"/><circle cx="254" cy="27" r="1.5"/>
+            <circle cx="418" cy="44" r="1.2"/><circle cx="521" cy="24" r="1.6"/><circle cx="731" cy="78" r="1.1"/>
+            <circle cx="352" cy="66" r="1"/><circle cx="586" cy="52" r="1.2"/>
+          </g>
+          <path d="M0 104 L112 72 L192 97 L282 64 L380 101 L470 78 L562 103 L660 82 L800 108 L800 190 L0 190Z"
+                fill="var(--palay)" opacity=".16"/>
+          <path d="M0 120 L800 120 L800 190 L0 190Z" fill="var(--palay)" opacity=".24"/>
+          <g stroke="var(--palay)" stroke-width="1" opacity=".42">
+            <path d="M0 133 H800"/><path d="M0 146 H800"/><path d="M0 162 H800"/><path d="M0 180 H800"/>
+          </g>
+          <path d="M374 120 L300 190 L468 190 L420 120Z" fill="var(--ink)" opacity=".9"/>
+          <g stroke="var(--paper)" stroke-width="2" opacity=".3" stroke-dasharray="9 13">
+            <path d="M398 126 L386 190"/>
+          </g>
+          <g fill="var(--palay)">
+            <circle cx="390" cy="143" r="2.6"/><circle cx="403" cy="143" r="2.6"/>
+          </g>
+        </svg>
         <h2 class="leg__title" id="d17">Drive to San Leonardo</h2>
         <p class="leg__note">Night drive — kumain muna bago umalis para diretso na.</p>
 
@@ -381,6 +412,18 @@
             <p class="stay"><strong>Overnight:</strong> Bry's House — Brgy. Nieves, San Leonardo</p>
           </li>
         </ol>
+
+        <div class="need">
+          <h4>Kailangan sa araw na ito</h4>
+          <ul class="check check--day">
+            <li><label><input type="checkbox"><span>Full tank bago umalis sa Taguig</span></label></li>
+            <li><label><input type="checkbox"><span>Cash at barya sa toll — huwag sa bag, sa bulsa</span></label></li>
+            <li><label><input type="checkbox"><span>Tubig at meryenda sa loob ng sasakyan</span></label></li>
+            <li><label><input type="checkbox"><span>Pasalubong para sa bahay nila Bry</span></label></li>
+            <li><label><input type="checkbox"><span>Pambahay at pantulog sa abot-kamay na bag</span></label></li>
+            <li><label><input type="checkbox"><span>Magpalit ng underwear bago matulog</span></label></li>
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -392,6 +435,31 @@
         <span class="leg__mon">September</span>
       </div>
       <div class="leg__body">
+        <svg class="scene" viewBox="0 0 800 190" role="img" aria-label="Ilog at talon sa kabundukan ng Gabaldon">
+          <rect width="800" height="190" fill="var(--paper-2)"/>
+          <path d="M0 112 L118 48 L214 98 L300 38 L418 110 L520 58 L618 106 L720 66 L800 110 L800 190 L0 190Z"
+                fill="var(--river)" opacity=".2"/>
+          <path d="M0 132 L150 86 L262 126 L362 82 L470 130 L590 92 L700 128 L800 100 L800 190 L0 190Z"
+                fill="var(--river)" opacity=".38"/>
+          <path d="M268 54 L258 138 L340 138 L326 54Z" fill="var(--river)" opacity=".62"/>
+          <path d="M292 58 L286 136 L308 136 L302 58Z" fill="var(--paper)" opacity=".9"/>
+          <g stroke="var(--river)" stroke-width="1" opacity=".4">
+            <path d="M295 64 V132"/><path d="M301 70 V130"/>
+          </g>
+          <path d="M0 142 L800 142 L800 190 L0 190Z" fill="var(--paper)" opacity=".82"/>
+          <g stroke="var(--river)" stroke-width="1.4" opacity=".55" fill="none" stroke-linecap="round">
+            <path d="M40 156 q22 -7 44 0 t44 0"/>
+            <path d="M330 152 q22 -7 44 0 t44 0"/>
+            <path d="M600 158 q22 -7 44 0 t44 0"/>
+            <path d="M150 172 q22 -7 44 0 t44 0"/>
+            <path d="M470 176 q22 -7 44 0 t44 0"/>
+          </g>
+          <g fill="var(--river)" opacity=".5">
+            <ellipse cx="120" cy="150" rx="19" ry="7"/>
+            <ellipse cx="530" cy="147" rx="13" ry="5"/>
+            <ellipse cx="690" cy="172" rx="22" ry="8"/>
+          </g>
+        </svg>
         <h2 class="leg__title" id="d18">Gabaldon: ilog at falls</h2>
         <p class="leg__note">Pinakamahabang araw ito — two drives and one ligo sa tubig-tabang.</p>
 
@@ -423,6 +491,21 @@
             <p class="stay"><strong>Overnight:</strong> Dingalan, Aurora — nights of Sep 18 and 19</p>
           </li>
         </ol>
+
+        <div class="need">
+          <h4>Kailangan sa ilog</h4>
+          <ul class="check check--day">
+            <li><label><input type="checkbox"><span>Cooler at ice — bilhin sa palengke ng umaga</span></label></li>
+            <li><label><input type="checkbox"><span>Ulam, rice, at pang-ihaw</span></label></li>
+            <li><label><input type="checkbox"><span>Tubig na maiinom, hiwalay sa ice</span></label></li>
+            <li><label><input type="checkbox"><span>Aqua shoes o tsinelas na hindi madulas — mabato ang ilog</span></label></li>
+            <li><label><input type="checkbox"><span>Dry bag o ziplock sa phone at susi</span></label></li>
+            <li><label><input type="checkbox"><span>Garbage bag — walang iiwang basura sa ilog</span></label></li>
+            <li><label><input type="checkbox"><span>Tuyong damit na naka-iwan sa sasakyan</span></label></li>
+            <li><label><input type="checkbox"><span>Cash sa entrance at guide — baka walang signal pang-GCash</span></label></li>
+            <li><label><input type="checkbox"><span>Magpalit ng underwear — mahaba ang biyahe mamaya</span></label></li>
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -434,6 +517,26 @@
         <span class="leg__mon">September</span>
       </div>
       <div class="leg__body">
+        <svg class="scene" viewBox="0 0 800 190" role="img" aria-label="Baybayin at mga bangin ng Dingalan sa Pacific">
+          <rect width="800" height="190" fill="var(--paper-2)"/>
+          <circle cx="602" cy="52" r="24" fill="var(--sea)" opacity=".22"/>
+          <path d="M0 96 L96 40 L168 82 L244 46 L330 92 L400 74 L466 96 L800 96 L800 118 L0 118Z"
+                fill="var(--sea)" opacity=".24"/>
+          <path d="M0 74 L70 24 L124 62 L176 34 L232 96 L150 118 L0 118Z" fill="var(--sea)" opacity=".5"/>
+          <path d="M0 118 L800 118 L800 168 L0 168Z" fill="var(--sea)" opacity=".34"/>
+          <g stroke="var(--sea)" stroke-width="1.5" opacity=".62" fill="none" stroke-linecap="round">
+            <path d="M60 130 q20 -6 40 0 t40 0"/>
+            <path d="M330 126 q20 -6 40 0 t40 0"/>
+            <path d="M620 132 q20 -6 40 0 t40 0"/>
+            <path d="M180 146 q20 -6 40 0 t40 0"/>
+            <path d="M470 150 q20 -6 40 0 t40 0"/>
+            <path d="M700 148 q20 -6 40 0 t40 0"/>
+          </g>
+          <path d="M0 168 q200 -14 400 2 t400 -4 L800 190 L0 190Z" fill="var(--paper)" opacity=".92"/>
+          <g stroke="var(--sea)" stroke-width="1" opacity=".3">
+            <path d="M0 176 q200 -12 400 2 t400 -4"/>
+          </g>
+        </svg>
         <h2 class="leg__title" id="d19">Swimming sa Dingalan</h2>
         <p class="leg__note">Ito na ang main beach day — buong araw sa dagat.</p>
 
@@ -454,6 +557,19 @@
             <p>Banlaw at sampay ng basang damit ngayon pa lang para medyo tuyo na bukas. Maluwag ang umaga, walang habol.</p>
           </li>
         </ol>
+
+        <div class="need">
+          <h4>Kailangan sa beach</h4>
+          <ul class="check check--day">
+            <li><label><input type="checkbox"><span>Sunblock bago pa lumusong, hindi kapag mainit na</span></label></li>
+            <li><label><input type="checkbox"><span>Rash guard — mas mabuti kaysa sunblock buong araw</span></label></li>
+            <li><label><input type="checkbox"><span>Waterproof pouch sa phone</span></label></li>
+            <li><label><input type="checkbox"><span>Inumin at meryenda — mabilis mauhaw sa alat</span></label></li>
+            <li><label><input type="checkbox"><span>Cash kung tutuloy ang boat trip</span></label></li>
+            <li><label><input type="checkbox"><span>Sampay ang basang damit bago matulog</span></label></li>
+            <li><label><input type="checkbox"><span>Magpalit ng underwear pagkatapos ng dagat — alat at buhangin</span></label></li>
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -465,6 +581,23 @@
         <span class="leg__mon">September</span>
       </div>
       <div class="leg__body">
+        <svg class="scene" viewBox="0 0 800 190" role="img" aria-label="Tanghaling pag-uwi sa daang bundok palabas ng Dingalan">
+          <rect width="800" height="190" fill="var(--paper-2)"/>
+          <circle cx="400" cy="38" r="20" fill="var(--sea)" opacity=".3"/>
+          <g stroke="var(--sea)" stroke-width="2" opacity=".28" stroke-linecap="round">
+            <path d="M400 6 V-2"/><path d="M400 74 V82"/><path d="M368 38 H360"/><path d="M440 38 H432"/>
+            <path d="M377 15 L371 9"/><path d="M423 61 L429 67"/><path d="M423 15 L429 9"/><path d="M377 61 L371 67"/>
+          </g>
+          <path d="M0 122 L130 60 L232 110 L338 52 L452 116 L556 66 L664 114 L800 72 L800 190 L0 190Z"
+                fill="var(--sea)" opacity=".2"/>
+          <path d="M0 146 L160 96 L286 138 L400 92 L520 142 L640 104 L760 140 L800 128 L800 190 L0 190Z"
+                fill="var(--sea)" opacity=".36"/>
+          <path d="M120 190 q90 -34 170 -30 q90 4 130 -26 q48 -34 130 -18"
+                fill="none" stroke="var(--paper)" stroke-width="7" opacity=".85" stroke-linecap="round"/>
+          <path d="M120 190 q90 -34 170 -30 q90 4 130 -26 q48 -34 130 -18"
+                fill="none" stroke="var(--sea)" stroke-width="1.6" opacity=".45"
+                stroke-dasharray="9 13" stroke-linecap="round"/>
+        </svg>
         <h2 class="leg__title" id="d20">Pahinga, then uwi</h2>
         <p class="leg__note">Walang alarm — pahinga lang hanggang tanghali.</p>
 
@@ -485,6 +618,18 @@
             <p>Check-out at alis. Mahaba ang daan pauwi at may bundok na dadaanan, kaya tama lang ang tanghaling alis — maliwanag pa sa pinakamahirap na parte.</p>
           </li>
         </ol>
+
+        <div class="need">
+          <h4>Bago mag-check-out</h4>
+          <ul class="check check--day">
+            <li><label><input type="checkbox"><span>Sweep ng kwarto: charger, tsinelas, tuwalya, cooler</span></label></li>
+            <li><label><input type="checkbox"><span>Basang gamit sa hiwalay na plastic</span></label></li>
+            <li><label><input type="checkbox"><span>Bayad sa check-out at anumang naka-bill</span></label></li>
+            <li><label><input type="checkbox"><span>Gas bago umakyat sa bundok — huli na sa taas</span></label></li>
+            <li><label><input type="checkbox"><span>Meryenda at tubig pauwi</span></label></li>
+            <li><label><input type="checkbox"><span>Magpalit ng underwear bago umuwi</span></label></li>
+          </ul>
+        </div>
       </div>
     </section>
 
@@ -492,38 +637,40 @@
 </main>
 
 <section class="baon wrap" aria-labelledby="baon">
-  <h2 id="baon">Before we leave on Thursday</h2>
-  <p class="baon__intro">I-check habang nagse-set ng gamit. Mabubura ang linya kapag na-tick — hindi ito naka-save, kaya bagong listahan kada bukas ng page.</p>
+  <h2 id="baon">I-pack bago umalis ng Thursday</h2>
+  <p class="baon__intro">Ito ang bag na isang beses lang iniempake sa bahay. Ang mga pang-araw-araw na kailangan ay nasa itaas, kasama ng araw na pagkakagamitan.</p>
 
   <div class="cols">
     <div>
       <h3>Damit at ligo</h3>
       <ul class="check">
-        <li><label><input type="checkbox"><span>Swimwear at extrang damit</span></label></li>
-        <li><label><input type="checkbox"><span>Towel</span></label></li>
-        <li><label><input type="checkbox"><span>Tsinelas na hindi madulas</span></label></li>
+        <li><label><input type="checkbox"><span>Damit kada araw at isang extra</span></label></li>
+        <li><label><input type="checkbox"><span>Swimwear at rash guard</span></label></li>
+        <li><label><input type="checkbox"><span>Tuwalya</span></label></li>
+        <li><label><input type="checkbox"><span>Tsinelas at aqua shoes</span></label></li>
         <li><label><input type="checkbox"><span>Sabon, shampoo, toothbrush</span></label></li>
-        <li><label><input type="checkbox"><span>Dry bag o plastic sa basang gamit</span></label></li>
+        <li><label><input type="checkbox"><span>Dry bag at plastic sa basang gamit</span></label></li>
+        <li><label><input type="checkbox"><span>Underwear kada araw at dalawang extra</span></label></li>
       </ul>
     </div>
     <div>
-      <h3>Pagkain at tubig</h3>
-      <ul class="check">
-        <li><label><input type="checkbox"><span>Cooler at ice</span></label></li>
-        <li><label><input type="checkbox"><span>Drinking water</span></label></li>
-        <li><label><input type="checkbox"><span>Ulam at rice para sa ilog</span></label></li>
-        <li><label><input type="checkbox"><span>Snacks para sa biyahe</span></label></li>
-        <li><label><input type="checkbox"><span>Garbage bag</span></label></li>
-      </ul>
-    </div>
-    <div>
-      <h3>Safety at pera</h3>
+      <h3>Safety at gamot</h3>
       <ul class="check">
         <li><label><input type="checkbox"><span>Sunblock at pang-lamok</span></label></li>
         <li><label><input type="checkbox"><span>Gamot, Band-Aid, betadine</span></label></li>
+        <li><label><input type="checkbox"><span>Sariling maintenance na gamot</span></label></li>
+        <li><label><input type="checkbox"><span>Flashlight o headlamp</span></label></li>
+        <li><label><input type="checkbox"><span>Pamatay-uhaw na tumbler</span></label></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Gamit at pera</h3>
+      <ul class="check">
         <li><label><input type="checkbox"><span>Powerbank at charger</span></label></li>
-        <li><label><input type="checkbox"><span>Barya at cash — baka walang ATM</span></label></li>
+        <li><label><input type="checkbox"><span>Cash at barya — baka walang ATM</span></label></li>
         <li><label><input type="checkbox"><span>ID at kopya ng plano</span></label></li>
+        <li><label><input type="checkbox"><span>Extra na plastic at garbage bag</span></label></li>
+        <li><label><input type="checkbox"><span>Papel ng sasakyan at license</span></label></li>
       </ul>
     </div>
   </div>
@@ -896,9 +1043,9 @@ var PALETTE = [
     zoomControl: true
   });
 
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-    maxZoom: 18,
-    attribution: '&copy; OpenStreetMap &middot; &copy; CARTO'
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
 
   routeLayer = L.layerGroup().addTo(map);
