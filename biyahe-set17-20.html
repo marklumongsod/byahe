@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en-PH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Barkada Trip — Taguig to Dingalan, Aurora · Sep 17–20</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
+<style>
+  :root{
+    --paper:#EAEDE6;
+    --paper-2:#E1E6DC;
+    --ink:#17241F;
+    --stone:#6F7C72;
+    --palay:#B8862B;
+    --river:#2C7A6B;
+    --sea:#1D5478;
+    --line:2px;
+    --date-col:9rem;
+    --gutter:3rem;
+    --measure:62ch;
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Newsreader",Georgia,serif;
+    font-size:clamp(1rem,.96rem + .2vw,1.075rem);
+    line-height:1.62;
+  }
+  .wrap{max-width:70rem;margin:0 auto;padding:0 clamp(1.25rem,4vw,3rem)}
+
+  h1,h2,h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-weight:700;margin:0;line-height:1.04;letter-spacing:-.02em}
+  p{margin:0}
+  a{color:inherit}
+
+  :focus-visible{outline:3px solid var(--river);outline-offset:3px;border-radius:2px}
+
+  /* ---------- hero ---------- */
+  .hero{padding:clamp(3rem,8vw,6.5rem) 0 clamp(2.5rem,5vw,4rem)}
+  .hero__grid{display:grid;gap:clamp(2rem,5vw,4rem);grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);align-items:end}
+  .hero__label{font-family:"Bricolage Grotesque",sans-serif;font-weight:500;font-size:.95rem;color:var(--stone);margin-bottom:1.25rem}
+  .hero h1{font-size:clamp(2.6rem,7.2vw,5.1rem);font-weight:800;max-width:14ch}
+  .hero__sub{margin-top:1.5rem;max-width:44ch;color:#33413A;font-size:1.08em}
+
+  .routecard{border-top:var(--line) solid var(--ink);padding-top:1rem}
+  .routecard dl{margin:0}
+  .routecard .row{display:grid;grid-template-columns:.9rem 1fr auto;gap:.85rem;align-items:baseline;padding:.85rem 0;border-bottom:1px solid rgba(23,36,31,.16)}
+  .routecard .row:last-child{border-bottom:0}
+  .chip{width:.9rem;height:.9rem;border-radius:50%;align-self:center}
+  .chip--start{background:var(--ink)}
+  .chip--palay{background:var(--palay)}
+  .chip--river{background:var(--river)}
+  .chip--sea{background:var(--sea)}
+  .routecard dt{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:1.02rem;margin:0}
+  .routecard dt span{display:block;font-weight:500;font-size:.85rem;color:var(--stone);letter-spacing:0}
+  .routecard dd{margin:0;font-variant-numeric:tabular-nums;color:var(--stone);font-size:.92rem;white-space:nowrap}
+
+  /* ---------- mapa ---------- */
+  .mapa{padding:0 0 clamp(2.5rem,5vw,4rem)}
+  .mapa__head{border-top:var(--line) solid var(--ink);padding-top:1.1rem;margin-bottom:1.4rem;display:flex;flex-wrap:wrap;gap:.6rem 2.5rem;align-items:baseline;justify-content:space-between}
+  .mapa__head h2{font-size:clamp(1.4rem,3vw,1.95rem)}
+  .mapa__hint{color:var(--stone);font-size:.93rem;max-width:40ch}
+  .mapa__grid{display:grid;grid-template-columns:minmax(0,1fr) 18rem;gap:1.25rem;align-items:start}
+
+  #map{height:clamp(22rem,58vh,34rem);border:var(--line) solid var(--ink);background:var(--paper-2);z-index:0}
+  .leaflet-container{font-family:"Newsreader",Georgia,serif;background:var(--paper-2)}
+  .leaflet-tile-pane{filter:saturate(.55) contrast(.94) brightness(1.02)}
+  .leaflet-bar a{color:var(--ink)}
+  .leaflet-popup-content-wrapper{border-radius:3px;box-shadow:0 6px 22px rgba(23,36,31,.18)}
+  .leaflet-popup-content{margin:.85rem 1rem;line-height:1.5}
+  .leaflet-popup-content b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-size:1.05rem;margin-bottom:.15rem}
+  .leaflet-popup-content em{display:block;font-style:normal;color:var(--stone);font-size:.85rem;margin-bottom:.45rem}
+  .leaflet-control-attribution{font-size:10px;background:rgba(234,237,230,.85)!important}
+
+  .pin{display:grid;place-items:center;width:1.55rem;height:1.55rem;border-radius:50%;
+       border:2px solid var(--paper);color:#fff;
+       font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:.78rem;line-height:1}
+  .pin--approx{border-style:dashed;opacity:.85}
+
+  .jumpbox h3{font-family:"Bricolage Grotesque",sans-serif;font-size:.95rem;font-weight:700;margin-bottom:.5rem}
+  .jump{list-style:none;margin:0 0 1rem;padding:0}
+  .jump button{display:grid;grid-template-columns:1.4rem minmax(0,1fr);gap:.75rem;align-items:center;
+    width:100%;text-align:left;font:inherit;color:inherit;background:none;cursor:pointer;
+    border:0;border-bottom:1px solid rgba(23,36,31,.15);padding:.7rem .25rem}
+  .jump button:hover{background:var(--paper-2)}
+  .jump .n{width:1.4rem;height:1.4rem;border-radius:50%;display:grid;place-items:center;color:#fff;
+    font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:.72rem}
+  .jump .t{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:.97rem;line-height:1.25}
+  .jump .s{display:block;font-family:"Newsreader",serif;font-weight:400;color:var(--stone);font-size:.84rem}
+  .resetbtn{font:inherit;font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:.88rem;
+    background:var(--ink);color:var(--paper);border:0;padding:.65rem 1rem;cursor:pointer;width:100%}
+  .resetbtn:hover{background:var(--sea)}
+  .gmapsbtn{display:block;margin-top:.5rem;text-align:center;text-decoration:none;
+    font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:.88rem;
+    border:var(--line) solid var(--ink);padding:.6rem 1rem}
+  .gmapsbtn:hover{background:var(--paper-2)}
+
+  .legsum{margin-top:1.1rem;border-top:1px solid rgba(23,36,31,.22)}
+  .leaflet-routing-container{display:none!important}
+
+  .leg-sum{border-bottom:1px solid rgba(23,36,31,.12)}
+  .leg-sum>summary{display:grid;grid-template-columns:.55rem minmax(0,1fr) auto;gap:.85rem;align-items:center;
+    padding:.65rem .35rem;cursor:pointer;list-style:none}
+  .leg-sum>summary::-webkit-details-marker{display:none}
+  .leg-sum>summary:hover{background:var(--paper-2)}
+  .leg-sum[open]>summary{background:var(--paper-2)}
+  .legsum__bar{width:.55rem;height:.55rem;border-radius:50%}
+  .legsum__name{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:.9rem}
+  .legsum__num{color:var(--stone);font-variant-numeric:tabular-nums;white-space:nowrap;font-size:.88rem}
+
+  .turns{list-style:none;margin:0;padding:.5rem .35rem .9rem 1.75rem;font-size:.88rem}
+  .turns li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1.25rem;padding:.38rem 0;
+    border-bottom:1px dotted rgba(23,36,31,.18);color:#3A473F;line-height:1.45}
+  .turns li:last-child{border-bottom:0}
+  .turns__km{color:var(--stone);font-variant-numeric:tabular-nums;white-space:nowrap;font-size:.84rem}
+  .turns__wait{display:block!important;color:var(--stone);font-style:italic}
+
+  .legsum__loading{color:var(--stone);font-size:.9rem;padding:.7rem 0}
+
+  /* ---------- editor ng mga hinto ---------- */
+  .editor{margin-top:1.4rem;border:var(--line) solid var(--ink)}
+  .editor>summary{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:.92rem;
+    padding:.75rem 1rem;cursor:pointer;list-style:none;display:flex;align-items:center;gap:.6rem}
+  .editor>summary::-webkit-details-marker{display:none}
+  .editor>summary::before{content:"+";font-weight:800;font-size:1.05rem;line-height:1}
+  .editor[open]>summary::before{content:"\2212"}
+  .editor>summary:hover{background:var(--paper-2)}
+  .editor__body{padding:.25rem 1rem 1.1rem;border-top:1px solid rgba(23,36,31,.2)}
+  .editor__how{font-size:.87rem;color:var(--stone);max-width:62ch;margin:.9rem 0 1.1rem;line-height:1.5}
+
+  .frow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) 12rem 2rem;gap:.5rem;
+    align-items:center;margin-bottom:.5rem}
+  .frow--head{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:.76rem;
+    color:var(--stone);margin-bottom:.35rem}
+  .frow input,.frow select{font:inherit;font-size:.9rem;padding:.5rem .6rem;
+    border:1px solid rgba(23,36,31,.35);background:var(--paper);color:var(--ink);border-radius:2px;min-width:0}
+  .frow input:focus,.frow select:focus{border-color:var(--river)}
+  .f-coord{font-variant-numeric:tabular-nums}
+  .f-del{font:inherit;font-size:1.15rem;line-height:1;background:none;border:0;color:var(--stone);
+    cursor:pointer;padding:.25rem}
+  .f-del:hover{color:#8C2F24}
+
+  .editor__act{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+  .btn{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:.86rem;
+    padding:.6rem 1rem;border:var(--line) solid var(--ink);background:var(--paper);color:var(--ink);cursor:pointer}
+  .btn:hover{background:var(--paper-2)}
+  .btn--primary{background:var(--ink);color:var(--paper)}
+  .btn--primary:hover{background:var(--sea)}
+  .editor__msg{margin-top:.8rem;font-size:.87rem;color:var(--river);min-height:1.2em}
+  .editor__msg.is-bad{color:#8C2F24}
+
+  @media (max-width:560px){
+    .frow{grid-template-columns:minmax(0,1fr) 2rem;gap:.45rem;
+      padding-bottom:.7rem;margin-bottom:.7rem;border-bottom:1px solid rgba(23,36,31,.15)}
+    .frow--head{display:none}
+    .frow .f-name{grid-column:1}
+    .frow .f-del{grid-column:2;grid-row:1}
+    .frow .f-coord,.frow .f-color{grid-column:1/-1}
+  }
+  .mapa__note{margin-top:.9rem;font-size:.85rem;color:var(--stone);line-height:1.5}
+  .noscript{padding:1.25rem;border:var(--line) dashed var(--stone);color:var(--stone)}
+
+  /* ---------- timeline ---------- */
+  .legs{position:relative;padding:clamp(1rem,3vw,2rem) 0 4rem}
+  .legs::before{
+    content:"";position:absolute;top:0;bottom:6rem;
+    left:calc(var(--date-col) + var(--gutter)/2 - (var(--line)/2));
+    width:var(--line);
+    background:linear-gradient(to bottom,
+      var(--palay) 0%, var(--palay) 22%,
+      var(--river) 38%, var(--river) 52%,
+      var(--sea) 66%, var(--sea) 100%);
+    transform-origin:top;
+    animation:draw 1.1s cubic-bezier(.22,.61,.36,1) both;
+  }
+  @keyframes draw{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+
+  .leg{display:grid;grid-template-columns:var(--date-col) var(--gutter) minmax(0,1fr);padding:clamp(2rem,4vw,3.25rem) 0 0}
+  .leg__date{grid-column:1;text-align:right;position:sticky;top:1.5rem;align-self:start}
+  .leg__dow{display:block;font-family:"Bricolage Grotesque",sans-serif;font-weight:500;font-size:.92rem;color:var(--stone)}
+  .leg__num{display:block;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:clamp(2.4rem,5vw,3.4rem);line-height:.9;letter-spacing:-.04em;color:var(--accent)}
+  .leg__mon{display:block;font-family:"Bricolage Grotesque",sans-serif;font-weight:500;font-size:.85rem;color:var(--stone);margin-top:.3rem}
+
+  .leg__body{grid-column:3;max-width:var(--measure)}
+  .leg__title{font-size:clamp(1.35rem,2.6vw,1.75rem);color:var(--accent)}
+  .leg__note{margin-top:.6rem;color:var(--stone);font-style:italic;font-size:.97em}
+
+  .leg--palay{--accent:var(--palay)}
+  .leg--river{--accent:var(--river)}
+  .leg--sea{--accent:var(--sea)}
+
+  .stops{list-style:none;margin:1.75rem 0 0;padding:0}
+  .stop{position:relative;padding:0 0 1.9rem}
+  .stop::before{
+    content:"";position:absolute;top:.62rem;
+    left:calc(-1 * var(--gutter)/2 - .3rem);
+    width:.6rem;height:.6rem;border-radius:50%;
+    background:var(--paper);border:var(--line) solid var(--accent);
+  }
+  .stop__time{display:flex;align-items:center;gap:.5rem;font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:.9rem;color:var(--accent);font-variant-numeric:tabular-nums}
+  .stop__time svg{width:1.05rem;height:1.05rem;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .stop h3{font-size:1.18rem;margin:.35rem 0 .3rem;font-weight:700}
+  .stop p{color:#3A473F}
+
+  .stop--stay::before{background:var(--accent)}
+  .stay{margin-top:.85rem;padding:.75rem 1rem;background:var(--paper-2);border-left:3px solid var(--accent);font-size:.95em}
+  .stay strong{font-family:"Bricolage Grotesque",sans-serif;font-weight:700}
+
+  .maybe{margin-top:.4rem;padding-left:1.15rem;color:#3A473F}
+  .maybe li{margin:.3rem 0}
+  .maybe li::marker{color:var(--accent)}
+
+  /* ---------- baon ---------- */
+  .baon{border-top:var(--line) solid var(--ink);padding:clamp(2.5rem,5vw,4rem) 0 clamp(3rem,6vw,5rem)}
+  .baon h2{font-size:clamp(1.6rem,3.4vw,2.1rem);max-width:18ch}
+  .baon__intro{margin-top:.9rem;max-width:52ch;color:#3A473F}
+  .cols{margin-top:2rem;display:grid;gap:1rem clamp(1.5rem,4vw,3rem);grid-template-columns:repeat(auto-fit,minmax(15rem,1fr))}
+  .cols h3{font-size:1rem;font-weight:700;margin-bottom:.7rem;padding-bottom:.45rem;border-bottom:1px solid rgba(23,36,31,.2)}
+  .check{list-style:none;margin:0;padding:0}
+  .check li{margin:.15rem 0}
+  .check label{display:flex;gap:.6rem;align-items:flex-start;padding:.28rem 0;cursor:pointer;font-size:.98em}
+  .check input{margin:.38rem 0 0;accent-color:var(--river);width:1rem;height:1rem;flex:none}
+  .check input:checked + span{color:var(--stone);text-decoration:line-through}
+
+  footer{border-top:1px solid rgba(23,36,31,.2);padding:1.75rem 0 3.5rem;color:var(--stone);font-size:.92rem;display:flex;flex-wrap:wrap;gap:.6rem 1.5rem;justify-content:space-between}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:860px){
+    .hero__grid{grid-template-columns:1fr;align-items:start}
+    .mapa__grid{grid-template-columns:1fr}
+    #map{height:22rem}
+  }
+  @media (max-width:640px){
+    :root{--date-col:0rem;--gutter:2.4rem}
+    .leg{grid-template-columns:var(--gutter) minmax(0,1fr)}
+    .leg__date{grid-column:2;text-align:left;position:static;display:flex;align-items:baseline;gap:.55rem;margin-bottom:.9rem}
+    .leg__num{font-size:2.5rem}
+    .leg__mon{margin-top:0}
+    .leg__body{grid-column:2}
+    .legs::before{bottom:4rem}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .legs::before{animation:none}
+    *{transition:none!important}
+  }
+
+  @media print{
+    :root{--paper:#fff;--paper-2:#f2f2f2}
+    body{font-size:10.5pt}
+    .leg{break-inside:avoid}
+    .legs::before{animation:none}
+    .editor,.jumpbox,.leaflet-control-container{display:none}
+    .mapa__grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M3 13.5h18M5.5 13.5 7 8.2A2 2 0 0 1 8.9 6.8h6.2A2 2 0 0 1 17 8.2l1.5 5.3M4 13.5v4.2M20 13.5v4.2M4 17.7h16M7 15.6h1.6M15.4 15.6H17"/></symbol>
+  <symbol id="i-bed" viewBox="0 0 24 24"><path d="M3 18V7M3 12h18v6M3 18h18M7.5 12V9.5h4a2 2 0 0 1 2 2V12"/></symbol>
+  <symbol id="i-basket" viewBox="0 0 24 24"><path d="M3.5 9h17l-1.7 9H5.2L3.5 9ZM8 9 10.5 4M16 9 13.5 4M9.5 12.2l.6 3M14.5 12.2l-.6 3"/></symbol>
+  <symbol id="i-water" viewBox="0 0 24 24"><path d="M2.5 8.5c2-1.8 3.4-1.8 5.3 0s3.4 1.8 5.3 0 3.4-1.8 5.3 0M2.5 13c2-1.8 3.4-1.8 5.3 0s3.4 1.8 5.3 0 3.4-1.8 5.3 0M2.5 17.5c2-1.8 3.4-1.8 5.3 0s3.4 1.8 5.3 0 3.4-1.8 5.3 0"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4"/></symbol>
+</svg>
+
+<header class="hero">
+  <div class="wrap hero__grid">
+    <div>
+      <p class="hero__label">Barkada trip &nbsp;·&nbsp; September 17–20, 2026</p>
+      <h1>Four days, mula palayan hanggang dagat.</h1>
+      <p class="hero__sub">Alis Thursday night. Ilog at falls sa Gabaldon, beach sa Dingalan, uwi ng Sunday. Ito ang plano — save it on your phone or print it.</p>
+    </div>
+
+    <div class="routecard">
+      <dl>
+        <div class="row">
+          <span class="chip chip--start"></span>
+          <dt>TESDA Complex<span>Taguig</span></dt>
+          <dd>Sep 17, 8 PM</dd>
+        </div>
+        <div class="row">
+          <span class="chip chip--palay"></span>
+          <dt>Bry's House<span>San Leonardo, Nueva Ecija</span></dt>
+          <dd>Sep 17–18</dd>
+        </div>
+        <div class="row">
+          <span class="chip chip--river"></span>
+          <dt>Gabaldon<span>ilog at falls</span></dt>
+          <dd>Sep 18</dd>
+        </div>
+        <div class="row">
+          <span class="chip chip--sea"></span>
+          <dt>Dingalan<span>Aurora</span></dt>
+          <dd>Sep 18–20</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</header>
+
+<section class="mapa wrap" aria-labelledby="mapa">
+  <div class="mapa__head">
+    <h2 id="mapa">Saan tayo pupunta</h2>
+    <p class="mapa__hint">Tap a pin or the list sa gilid para lumapit sa bawat stop. Tap a leg below the map for turn-by-turn directions.</p>
+  </div>
+
+  <div class="mapa__grid">
+    <div>
+      <div id="map" role="application" aria-label="Route map from Taguig to Dingalan, Aurora"></div>
+      <noscript><p class="noscript">JavaScript is off, kaya hindi lalabas ang mapa. Nandiyan pa rin sa ibaba ang buong itinerary.</p></noscript>
+
+      <div class="legsum" id="legsum" aria-live="polite">
+        <p class="legsum__loading">Kinukuha ang route sa kalsada&hellip;</p>
+      </div>
+
+      <p class="mapa__note">Estimate lang ang oras — no traffic, no stops, at hindi kasama ang gabing biyahe o ang bundok na daan papuntang Dingalan. Dagdagan mo ng allowance.</p>
+
+      <details class="editor">
+        <summary>Edit the stops</summary>
+        <div class="editor__body">
+          <p class="editor__how">Sa Google Maps: right-click the spot, pindutin ang mga numerong lalabas para ma-copy, then paste it sa coordinates box. Okay rin kung naka-space o naka-semicolon.</p>
+
+          <div class="frow frow--head" aria-hidden="true">
+            <span>Name</span><span>Coordinates</span><span>Color</span><span></span>
+          </div>
+          <div id="fields"></div>
+
+          <div class="editor__act">
+            <button type="button" id="apply" class="btn btn--primary">Update the map</button>
+            <button type="button" id="addstop" class="btn">Add a stop</button>
+            <button type="button" id="resetstops" class="btn">Reset to default</button>
+          </div>
+
+          <p class="editor__msg" id="msg" role="status"></p>
+        </div>
+      </details>
+    </div>
+
+    <div class="jumpbox">
+      <h3>Mga stop</h3>
+      <ul class="jump" id="jump"></ul>
+      <button class="resetbtn" type="button" id="resetmap">Show the whole route</button>
+      <a class="gmapsbtn" id="gmaps" href="https://www.google.com/maps" target="_blank" rel="noopener">Open in Google Maps</a>
+    </div>
+  </div>
+</section>
+
+<main class="wrap">
+  <div class="legs">
+
+    <!-- SET 17 -->
+    <section class="leg leg--palay" aria-labelledby="d17">
+      <div class="leg__date">
+        <span class="leg__dow">Thursday</span>
+        <span class="leg__num">17</span>
+        <span class="leg__mon">September</span>
+      </div>
+      <div class="leg__body">
+        <h2 class="leg__title" id="d17">Drive to San Leonardo</h2>
+        <p class="leg__note">Night drive — kumain muna bago umalis para diretso na.</p>
+
+        <ol class="stops">
+          <li class="stop">
+            <span class="stop__time"><svg aria-hidden="true"><use href="#i-car"/></svg>8:00 PM</span>
+            <h3>Alis sa TESDA Taguig</h3>
+            <p>Meet-up sa TESDA Complex, East Service Road. Kumpleto na ang tao at gamit bago umandar — check the gas, tires, at load.</p>
+          </li>
+          <li class="stop stop--stay">
+            <span class="stop__time"><svg aria-hidden="true"><use href="#i-bed"/></svg>Gabi</span>
+            <h3>Dating sa Bry's House</h3>
+            <p>Ayos gamit, tulog agad — maaga ang gising bukas.</p>
+            <p class="stay"><strong>Overnight:</strong> Bry's House — Brgy. Nieves, San Leonardo</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- SET 18 -->
+    <section class="leg leg--river" aria-labelledby="d18">
+      <div class="leg__date">
+        <span class="leg__dow">Friday</span>
+        <span class="leg__num">18</span>
+        <span class="leg__mon">September</span>
+      </div>
+      <div class="leg__body">
+        <h2 class="leg__title" id="d18">Gabaldon: ilog at falls</h2>
+        <p class="leg__note">Pinakamahabang araw ito — two drives and one ligo sa tubig-tabang.</p>
+
+        <ol class="stops">
+          <li class="stop">
+            <span class="stop__time"><svg aria-hidden="true"><use href="#i-basket"/></svg>Umaga</span>
+            <h3>Mamalengke</h3>
+            <p>Ulam, rice, drinks, ice, at baon para sa ilog. One list lang para hindi doble-doble ang bili.</p>
+          </li>
+          <li class="stop">
+            <span class="stop__time"><svg aria-hidden="true"><use href="#i-car"/></svg>Pagkatapos mamalengke</span>
+            <h3>Drive to Gabaldon</h3>
+            <p>Papasok na sa bundok ang daan. Habol ang dating bago mag-lunch para buo ang oras sa tubig.</p>
+          </li>
+          <li class="stop">
+            <span class="stop__time"><svg aria-hidden="true"><use href="#i-water"/></svg>Tanghali</span>
+            <h3>Ilog at falls</h3>
+            <p>Lunch sa tabi ng ilog, then ligo. Ingat sa madulas na bato at sa lalim — huwag mag-isang lalayo.</p>
+          </li>
+          <li class="stop">
+            <span class="stop__time"><svg aria-hidden="true"><use href="#i-car"/></svg>4:00 PM</span>
+            <h3>Alis papuntang Dingalan</h3>
+            <p>Ligpit at linis bago umalis. Palipat na ito sa Aurora, kaya target na makaalis bago dumilim.</p>
+          </li>
+          <li class="stop stop--stay">
+            <span class="stop__time"><svg aria-hidden="true"><use href="#i-bed"/></svg>Gabi</span>
+            <h3>Dating sa Dingalan</h3>
+            <p>Check-in, dinner, at pahinga. Dito na hanggang Sunday.</p>
+            <p class="stay"><strong>Overnight:</strong> Dingalan, Aurora — nights of Sep 18 and 19</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- SET 19 -->
+    <section class="leg leg--sea" aria-labelledby="d19">
+      <div class="leg__date">
+        <span class="leg__dow">Saturday</span>
+        <span class="leg__num">19</span>
+        <span class="leg__mon">September</span>
+      </div>
+      <div class="leg__body">
+        <h2 class="leg__title" id="d19">Buong araw sa Dingalan</h2>
+        <p class="leg__note">Wala pang fixed na plano dito — mga pwedeng gawin lang ang nasa baba.</p>
+
+        <ol class="stops">
+          <li class="stop">
+            <span class="stop__time"><svg aria-hidden="true"><use href="#i-sun"/></svg>Umaga hanggang hapon</span>
+            <h3>Free day</h3>
+            <p>Pwedeng pagpilian sa umaga kung ano ang gusto ng grupo:</p>
+            <ul class="maybe">
+              <li>Akyat sa view deck para sa tanawin ng bay</li>
+              <li>Boat trip papunta sa mga kalapit na baybayin</li>
+              <li>Tambay lang sa beach at lutong dinner</li>
+            </ul>
+          </li>
+          <li class="stop stop--stay">
+            <span class="stop__time"><svg aria-hidden="true"><use href="#i-bed"/></svg>Gabi</span>
+            <h3>Second night sa Dingalan</h3>
+            <p>Ihanda na ang gamit pang-swimming para diretso na bukas ng umaga.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- SET 20 -->
+    <section class="leg leg--sea" aria-labelledby="d20">
+      <div class="leg__date">
+        <span class="leg__dow">Sunday</span>
+        <span class="leg__num">20</span>
+        <span class="leg__mon">September</span>
+      </div>
+      <div class="leg__body">
+        <h2 class="leg__title" id="d20">Swimming, then uwi</h2>
+        <p class="leg__note">Last day — maagang ligo habang malamig pa ang tubig.</p>
+
+        <ol class="stops">
+          <li class="stop">
+            <span class="stop__time"><svg aria-hidden="true"><use href="#i-water"/></svg>Umaga</span>
+            <h3>Swimming sa beach</h3>
+            <p>Bantayan ang alon at agos — Pacific side ito, kaya malakas minsan. Huwag lalayo sa pampang.</p>
+          </li>
+          <li class="stop">
+            <span class="stop__time"><svg aria-hidden="true"><use href="#i-sun"/></svg>Tanghali</span>
+            <h3>Banlaw, kain, ligpit</h3>
+            <p>Last check ng kwarto: charger, tsinelas, basang damit. Walang maiiwan.</p>
+          </li>
+          <li class="stop">
+            <span class="stop__time"><svg aria-hidden="true"><use href="#i-car"/></svg>Hapon</span>
+            <h3>Uwi</h3>
+            <p>Mahaba ang daan pauwi at may bundok na dadaanan, kaya mas okay kung maliwanag pa.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<section class="baon wrap" aria-labelledby="baon">
+  <h2 id="baon">Before we leave on Thursday</h2>
+  <p class="baon__intro">I-check habang nagse-set ng gamit. Mabubura ang linya kapag na-tick — hindi ito naka-save, kaya bagong listahan kada bukas ng page.</p>
+
+  <div class="cols">
+    <div>
+      <h3>Damit at ligo</h3>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Swimwear at extrang damit</span></label></li>
+        <li><label><input type="checkbox"><span>Towel</span></label></li>
+        <li><label><input type="checkbox"><span>Tsinelas na hindi madulas</span></label></li>
+        <li><label><input type="checkbox"><span>Sabon, shampoo, toothbrush</span></label></li>
+        <li><label><input type="checkbox"><span>Dry bag o plastic sa basang gamit</span></label></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Pagkain at tubig</h3>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Cooler at ice</span></label></li>
+        <li><label><input type="checkbox"><span>Drinking water</span></label></li>
+        <li><label><input type="checkbox"><span>Ulam at rice para sa ilog</span></label></li>
+        <li><label><input type="checkbox"><span>Snacks para sa biyahe</span></label></li>
+        <li><label><input type="checkbox"><span>Garbage bag</span></label></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Safety at pera</h3>
+      <ul class="check">
+        <li><label><input type="checkbox"><span>Sunblock at pang-lamok</span></label></li>
+        <li><label><input type="checkbox"><span>Gamot, Band-Aid, betadine</span></label></li>
+        <li><label><input type="checkbox"><span>Powerbank at charger</span></label></li>
+        <li><label><input type="checkbox"><span>Barya at cash — baka walang ATM</span></label></li>
+        <li><label><input type="checkbox"><span>ID at kopya ng plano</span></label></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <span>Trip Sep 17–20, 2026 — Taguig to Dingalan, Aurora</span>
+  <span>Pwedeng magbago ang oras depende sa traffic at panahon.</span>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+<script>
+/* =========================================================================
+   Mga stop. Pwede mo na itong baguhin sa mismong page — buksan ang
+   "Edit the stops" sa ilalim ng mapa. Ito lang ang panimulang laman.
+   ========================================================================= */
+var DEFAULT_STOPS = [
+  { name: "TESDA Complex", sub: "Taguig \u00b7 alis 8:00 PM, Sep 17",
+    lat: 14.5197, lng: 121.0310, color: "#B8862B",
+    text: "Start ng biyahe. East Service Road, Western Bicutan." },
+
+  { name: "Bry's House", sub: "Brgy. Nieves, San Leonardo \u00b7 night of Sep 17",
+    lat: 15.3262, lng: 120.9478, color: "#B8862B", approx: true,
+    text: "Dating Thursday night. Unang overnight. Barangay center pa lang ang pin \u2014 i-adjust mo sa exact na bahay." },
+
+  { name: "Gabaldon", sub: "ilog at falls \u00b7 Sep 18",
+    lat: 15.4506, lng: 121.3377, color: "#2C7A6B",
+    text: "Buong hapon sa tubig-tabang. Alis dito ng 4:00 PM." },
+
+  { name: "Dingalan", sub: "Aurora \u00b7 Sep 18\u201320",
+    lat: 15.3894, lng: 121.3927, color: "#1D5478",
+    text: "Bayan ng Dingalan. Dito ang two nights, Sep 18 at 19." },
+
+  { name: "Aplaya", sub: "beachfront \u00b7 Sep 20",
+    lat: 15.3804, lng: 121.3939, color: "#1D5478",
+    text: "Tabing-dagat. Dito ang swimming ng Sunday morning." }
+];
+
+var PALETTE = [
+  { v: "#B8862B", label: "Gold \u2014 Nueva Ecija" },
+  { v: "#2C7A6B", label: "Green \u2014 Gabaldon" },
+  { v: "#1D5478", label: "Blue \u2014 Dingalan" }
+];
+
+(function () {
+  if (typeof L === "undefined") return;
+
+  var STOPS = [];
+  var map, routeLayer, markerLayer;
+  var controls = [];
+  var allBounds = null;
+  var token = 0;
+
+  var sumbox = document.getElementById("legsum");
+  var jumpList = document.getElementById("jump");
+  var fields = document.getElementById("fields");
+  var msg = document.getElementById("msg");
+
+  var formatter = null;
+  try { formatter = new L.Routing.Formatter({ units: "metric" }); } catch (e) { formatter = null; }
+
+  /* ---------- helpers ---------- */
+
+  function fmtDur(sec) {
+    var m = Math.round(sec / 60), h = Math.floor(m / 60);
+    m = m % 60;
+    if (h && m) return h + " oras " + m + " min";
+    if (h) return h + " oras";
+    return m + " min";
+  }
+
+  function fmtDist(m) {
+    return m >= 1000 ? (m / 1000).toFixed(1) + " km" : Math.round(m) + " m";
+  }
+
+  function isApprox(s) {
+    return !!s.approx;
+  }
+
+  function parseCoord(raw) {
+    if (!raw) return null;
+    var parts = String(raw).replace(/[()]/g, "").split(/[,;\s]+/).filter(Boolean);
+    if (parts.length < 2) return null;
+    var lat = parseFloat(parts[0]), lng = parseFloat(parts[1]);
+    if (!isFinite(lat) || !isFinite(lng)) return null;
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+    return { lat: lat, lng: lng };
+  }
+
+  function say(text, bad) {
+    msg.textContent = text || "";
+    msg.className = "editor__msg" + (bad ? " is-bad" : "");
+  }
+
+  /* ---------- URL hash: pwedeng i-bookmark o i-share ---------- */
+
+  function writeHash() {
+    var s = STOPS.map(function (x) {
+      return [encodeURIComponent(x.name), x.lat, x.lng, x.color.replace("#", "")].join("~");
+    }).join("|");
+    try { history.replaceState(null, "", "#s=" + s); } catch (e) {}
+  }
+
+  function readHash() {
+    var m = location.hash.match(/#s=(.+)$/);
+    if (!m) return null;
+    var out = [];
+    m[1].split("|").forEach(function (chunk) {
+      var p = chunk.split("~");
+      if (p.length < 3) return;
+      var c = parseCoord(p[1] + "," + p[2]);
+      if (!c) return;
+      var name = decodeURIComponent(p[0]);
+      var match = DEFAULT_STOPS.filter(function (d) { return d.name === name; })[0];
+      out.push({
+        name: name, lat: c.lat, lng: c.lng,
+        color: p[3] ? "#" + p[3] : PALETTE[0].v,
+        sub: match ? match.sub : "",
+        text: match ? match.text : "",
+        approx: !!(match && match.approx && match.lat === c.lat && match.lng === c.lng)
+      });
+    });
+    return out.length >= 2 ? out : null;
+  }
+
+  /* ---------- editor ---------- */
+
+  function addRow(stop) {
+    var row = document.createElement("div");
+    row.className = "frow";
+
+    var name = document.createElement("input");
+    name.type = "text";
+    name.className = "f-name";
+    name.value = stop ? stop.name : "";
+    name.placeholder = "Name of the place";
+
+    var coord = document.createElement("input");
+    coord.type = "text";
+    coord.className = "f-coord";
+    coord.inputMode = "decimal";
+    coord.value = stop ? stop.lat + ", " + stop.lng : "";
+    coord.placeholder = "15.4506, 121.3377";
+
+    var color = document.createElement("select");
+    color.className = "f-color";
+    PALETTE.forEach(function (p) {
+      var o = document.createElement("option");
+      o.value = p.v;
+      o.textContent = p.label;
+      color.appendChild(o);
+    });
+    if (stop) color.value = stop.color;
+
+    var del = document.createElement("button");
+    del.type = "button";
+    del.className = "f-del";
+    del.title = "Remove this stop";
+    del.setAttribute("aria-label", "Remove this stop");
+    del.textContent = "\u00d7";
+    del.addEventListener("click", function () { row.remove(); });
+
+    row.appendChild(name);
+    row.appendChild(coord);
+    row.appendChild(color);
+    row.appendChild(del);
+    fields.appendChild(row);
+  }
+
+  function buildForm() {
+    fields.innerHTML = "";
+    STOPS.forEach(addRow);
+  }
+
+  function readForm() {
+    var out = [], bad = null;
+    var rows = fields.querySelectorAll(".frow");
+
+    for (var i = 0; i < rows.length; i++) {
+      var name = rows[i].querySelector(".f-name").value.trim();
+      var rawCoord = rows[i].querySelector(".f-coord").value.trim();
+      var color = rows[i].querySelector(".f-color").value;
+
+      if (!name && !rawCoord) continue;
+
+      var c = parseCoord(rawCoord);
+      if (!c) { bad = (name || "Hinto " + (i + 1)); break; }
+
+      var prev = STOPS.filter(function (s) { return s.name === name; })[0];
+      out.push({
+        name: name || "Hinto " + (i + 1),
+        lat: c.lat, lng: c.lng, color: color,
+        sub: prev ? prev.sub : "",
+        text: prev ? prev.text : "",
+        approx: !!(prev && prev.approx && prev.lat === c.lat && prev.lng === c.lng)
+      });
+    }
+
+    if (bad) { say("Mali ang coordinates ng \u201c" + bad + "\u201d. Ganito ang tama: 15.4506, 121.3377", true); return null; }
+    if (out.length < 2) { say("Kailangan ng at least two stops.", true); return null; }
+    return out;
+  }
+
+  /* ---------- render ---------- */
+
+  function clearMap() {
+    controls.forEach(function (c) { try { map.removeControl(c); } catch (e) {} });
+    controls = [];
+    routeLayer.clearLayers();
+    markerLayer.clearLayers();
+    jumpList.innerHTML = "";
+    sumbox.innerHTML = '<p class="legsum__loading">Kinukuha ang route sa kalsada&hellip;</p>';
+  }
+
+  function fitAll() {
+    if (allBounds && allBounds.isValid()) map.fitBounds(allBounds, { padding: [45, 45] });
+  }
+
+  function render() {
+    var mine = ++token;
+    clearMap();
+
+    allBounds = L.latLngBounds(STOPS.map(function (s) { return [s.lat, s.lng]; }));
+    fitAll();
+
+    /* pins + listahan sa gilid */
+    STOPS.forEach(function (s, i) {
+      var icon = L.divIcon({
+        className: "",
+        html: '<div class="pin' + (isApprox(s) ? " pin--approx" : "") +
+              '" style="background:' + s.color + '">' + (i + 1) + "</div>",
+        iconSize: [25, 25], iconAnchor: [12, 12], popupAnchor: [0, -12]
+      });
+
+      var sub = s.sub || (s.lat.toFixed(4) + ", " + s.lng.toFixed(4));
+      var m = L.marker([s.lat, s.lng], { icon: icon, title: s.name })
+        .addTo(markerLayer)
+        .bindPopup("<b>" + s.name + "</b><em>" + sub + "</em>" + (s.text || ""));
+
+      var li = document.createElement("li");
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.innerHTML =
+        '<span class="n" style="background:' + s.color + '">' + (i + 1) + "</span>" +
+        '<span class="t"></span>';
+      var t = btn.querySelector(".t");
+      t.textContent = s.name;
+      var sm = document.createElement("span");
+      sm.className = "s";
+      sm.textContent = sub;
+      t.appendChild(sm);
+
+      btn.addEventListener("click", function () {
+        map.flyTo([s.lat, s.lng], 12, { duration: .8 });
+        m.openPopup();
+      });
+      li.appendChild(btn);
+      jumpList.appendChild(li);
+    });
+
+    /* Google Maps directions */
+    var g = document.getElementById("gmaps");
+    if (g) {
+      g.href = "https://www.google.com/maps/dir/" +
+        STOPS.map(function (s) { return s.lat + "," + s.lng; }).join("/");
+    }
+
+    /* ruta kada leg */
+    var pending = STOPS.length - 1;
+
+    function done() {
+      if (mine !== token) return;
+      pending -= 1;
+      if (pending > 0) return;
+      var loading = sumbox.querySelector(".legsum__loading");
+      if (loading) loading.remove();
+      fitAll();
+    }
+
+    STOPS.slice(0, -1).forEach(function (a, i) {
+      var b = STOPS[i + 1];
+
+      var box = document.createElement("details");
+      box.className = "leg-sum";
+      box.innerHTML =
+        '<summary>' +
+          '<span class="legsum__bar" style="background:' + b.color + '"></span>' +
+          '<span class="legsum__name"></span>' +
+          '<span class="legsum__num">\u2026</span>' +
+        '</summary>' +
+        '<ol class="turns"><li class="turns__wait">Kinukuha pa ang directions\u2026</li></ol>';
+      box.querySelector(".legsum__name").textContent = a.name + " \u2192 " + b.name;
+      sumbox.appendChild(box);
+
+      var num = box.querySelector(".legsum__num");
+      var turns = box.querySelector(".turns");
+
+      var ctrl = L.Routing.control({
+        waypoints: [L.latLng(a.lat, a.lng), L.latLng(b.lat, b.lng)],
+        lineOptions: {
+          addWaypoints: false,
+          styles: [
+            { color: "#EAEDE6", opacity: .9, weight: 8 },
+            { color: b.color, opacity: 1, weight: 3.5 }
+          ]
+        },
+        createMarker: function () { return null; },
+        addWaypoints: false,
+        draggableWaypoints: false,
+        routeWhileDragging: false,
+        fitSelectedRoutes: false,
+        showAlternatives: false,
+        show: false
+      }).addTo(map);
+      controls.push(ctrl);
+
+      ctrl.on("routesfound", function (e) {
+        if (mine !== token) return;
+        var r = e.routes && e.routes[0];
+        if (!r) return;
+
+        num.textContent =
+          (r.summary.totalDistance / 1000).toFixed(0) + " km \u00b7 ~" + fmtDur(r.summary.totalTime);
+
+        if (r.coordinates && r.coordinates.length) allBounds.extend(L.latLngBounds(r.coordinates));
+
+        turns.innerHTML = "";
+        (r.instructions || []).forEach(function (ins, k) {
+          var text = "";
+          try { text = formatter ? formatter.formatInstruction(ins, k) : (ins.text || ""); }
+          catch (err) { text = ins.text || ""; }
+          if (!text) return;
+
+          var li = document.createElement("li");
+          var tt = document.createElement("span");
+          tt.textContent = text;
+          var dd = document.createElement("span");
+          dd.className = "turns__km";
+          dd.textContent = fmtDist(ins.distance || 0);
+          li.appendChild(tt);
+          li.appendChild(dd);
+          turns.appendChild(li);
+        });
+
+        if (!turns.children.length) {
+          turns.innerHTML = '<li class="turns__wait">Walang detalyadong directions para sa leg na ito.</li>';
+        }
+        done();
+      });
+
+      ctrl.on("routingerror", function () {
+        if (mine !== token) return;
+        num.textContent = "no data";
+        turns.innerHTML =
+          '<li class="turns__wait">Hindi makuha ang route \u2014 straight line lang ang nakaguhit.</li>';
+        L.polyline([[a.lat, a.lng], [b.lat, b.lng]], {
+          color: b.color, weight: 3, opacity: .7, dashArray: "7 7"
+        }).addTo(routeLayer);
+        done();
+      });
+    });
+  }
+
+  /* ---------- simula ---------- */
+
+  map = L.map("map", {
+    scrollWheelZoom: false,
+    dragging: !L.Browser.mobile,
+    zoomControl: true
+  });
+
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+    maxZoom: 18,
+    attribution: '&copy; OpenStreetMap &middot; &copy; CARTO'
+  }).addTo(map);
+
+  routeLayer = L.layerGroup().addTo(map);
+  markerLayer = L.layerGroup().addTo(map);
+
+  map.on("click", function () { map.scrollWheelZoom.enable(); });
+  map.on("mouseout", function () { map.scrollWheelZoom.disable(); });
+
+  document.getElementById("resetmap").addEventListener("click", function () {
+    map.closePopup();
+    fitAll();
+  });
+
+  document.getElementById("addstop").addEventListener("click", function () {
+    addRow(null);
+    fields.querySelectorAll(".f-name")[fields.querySelectorAll(".f-name").length - 1].focus();
+  });
+
+  document.getElementById("apply").addEventListener("click", function () {
+    var next = readForm();
+    if (!next) return;
+    STOPS = next;
+    say("Updated na ang mapa. Naka-save na rin sa link sa address bar \u2014 pwede mo nang i-share.");
+    writeHash();
+    render();
+  });
+
+  document.getElementById("resetstops").addEventListener("click", function () {
+    STOPS = DEFAULT_STOPS.map(function (s) { return Object.assign({}, s); });
+    try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+    buildForm();
+    say("Balik na sa default na mga stop.");
+    render();
+  });
+
+  STOPS = readHash() || DEFAULT_STOPS.map(function (s) { return Object.assign({}, s); });
+  buildForm();
+  render();
+})();
+</script>
+
+</body>
+</html>
